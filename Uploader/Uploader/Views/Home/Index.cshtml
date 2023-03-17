@@ -1,0 +1,135 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1 class="text-center">@TempData["SessionId"]</h1>
+
+@*<div class="container">
+    <div class="drop-zone">
+    <div class="timer-bar">
+    <div class="wrapper">
+    <i class="success-icon ion-ios-checkmark-empty"></i>
+    <p class="success-text"></p>
+    </div>
+    </div>
+    <p class="timer-info">Drop your file here</p>
+    </div>
+    </div>*@
+
+<div class="card-upload">
+    <div class="box">
+        <div class="waiting" style="display: none">
+            <h3>لطفا تا پایان عملیات منتظر باشد</h3>
+        </div>
+        <div class="drop-zone" id="boxDrop">
+            <img src="~/images/folder.png" alt="file" width="100" />
+            <h3>فایل خود را اینجا رها کنید</h3>
+            <label class="btn-file" for="fileSelect">انتخاب فایل</label>
+            <input type="file" id="fileSelect" name="File" hidden />
+        </div>
+    </div>
+    <div id="boxUpload" style="display: none">
+        <div class="box">
+            <div class="fill-bak percent">
+                <h3 class="d-none">انجام شد</h3>
+            </div>
+            <div class="card-item">
+                <div class="d-flex jc-space">
+                    <section>
+                        <h4 class="file-title">file.name</h4>
+                        <small id="percent">0 %</small>
+                    </section>
+                    <section class="card-action">
+                        <button class="btn-pause" onclick="ToggleUpload(this, true)">
+                            <img src="~/images/play.svg" />
+                        </button>
+                        <button class="btn-cancel" onclick="CancelUpload()">
+                            <img src="~/images/cancel.svg" />
+                        </button>
+                    </section>
+                </div>
+                <div class="progress-bar percent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+<script src="https://cdnjs.cloudflare.com/ajax/libs/network-js/2.1.0/network.min.js" integrity="sha512-Py5RJUQ8xXl07uE5eulmHrpZgAPQpXwNouXj7TrwKe8+kVR3pdkRSso45o+j1iRyDZhTSsPB0dTSJgiori1vXw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    var settings = {
+        latency: {
+            // Where is located your `network.php` file.
+            endpoint: '/Home/Speed',
+            // How many measures should be returned.
+            measures: 5,
+            // How much attempts to get a valid value should be done for each measure.
+            attempts: 3
+        },
+        upload: {
+            endpoint: '/Home/Speed',
+            data: {
+                // The amount of data to initially use.
+                size: 1 * 1024 * 1024, // 2 MB
+
+                // If the measure period can't reach the delay defined in the settings,
+                // the data amount is multiplied by the following value.
+                multiplier: 2
+            }
+        },
+    };
+        // Create a new Network instance by providing an optional object.
+        var net = new Network(settings);
+
+        // Listen for the "end" event which provides the calculated latencies.
+        //net.latency.on('end', function(averageLatency, allLatencies) {
+        //    // "allLatencies" is an array containing the five calculated latencies in
+        //    // milliseconds. They're used to determine an average latency.
+        //    console.log('end', averageLatency, allLatencies);
+        //});
+
+        //// Once all the configuration is done, start the requests for this module.
+        //net.latency.start();
+
+        // It is possible to chain functions for all the modules, here's an example with the
+        // upload module.
+        net.upload
+             .on('start', function(dataSize) {
+                 console.log('start', dataSize);
+             })
+             .on('progress', function(averageSpeed, instantSpeed) {
+                 // Every bandwidth measure are in Mega BYTES per second!
+                 console.log('progress', averageSpeed, instantSpeed);
+             })
+             .on('restart', function(dataSize) {
+                 // The restart event is triggered when the module didn't have time
+                 // (according to the `delay` option) to take all the measures. A new
+                 // request will start with data size increased by the multiplier value.
+                 console.log('restart', dataSize);
+             })
+             .on('end', function(averageSpeed, allInstantSpeeds) {
+                 console.log('end', averageSpeed, allInstantSpeeds);
+             })
+             .start();
+
+        // You can also cancel a request (except for the "latency" module).
+        //net.upload.abort();
+
+        //net.download
+        //     .on('start', function(dataSize) {
+        //         console.log('start', dataSize);
+        //     })
+        //     .on('progress', function(averageSpeed, instantSpeed) {
+        //         console.log('progress', averageSpeed, instantSpeed);
+        //     })
+        //     .on('restart', function(dataSize) {
+        //         console.log('restart', dataSize);
+        //     })
+        //     .on('end', function(averageSpeed, allInstantSpeeds) {
+        //         console.log('end', averageSpeed, allInstantSpeeds);
+        //     })
+        //     .start();
+
+        //net.download.abort();
+</script>
+}
